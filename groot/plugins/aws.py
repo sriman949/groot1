@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analysis - Groot</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid">
+<div class="row">
+<!-- Sidebar -->
+<div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+<div class="position-sticky pt-3">
+<div class="text-center mb-4">
+<h3 class="text-success">🌱 Groot 🌱</h3>
+<p class="text-muted">K8s Troubleshooting</p>
+</div>
+<ul class="nav flex-column">
+<li class="nav-item">
+<a class="nav-link" href="/">
+<span data-feather="home"></span>
+Home
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="/dashboard">
+<span data-feather="bar-chart-2"></span>
+Dashboard
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" href="/analysis">
+<span data-feather="layers"></span>
+Analysis
+</a>
+</li>
+</ul>
+</div>
+</div>
+
+<!-- Main content -->
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<h1 class="h2">Kubernetes Analysis</h1>
+</div>
+
+<div class="row mb-4">
+<div class="col-md-6">
+<div class="card">
+<div class="card-header bg-success text-white">
+<h5 class="card-title mb-0">Scan Namespace</h5>
+</div>
+<div class="card-body">
+<form id="scan-form">
+<div class="mb-3">
+<label for="namespace" class="form-label">Namespace</label>
+<input type="text" class="form-control" id="namespace" value="default" required>
+</div>
+<button type="submit" class="btn btn-success">Scan for Issues</button>
+</form>
+</div>
+</div>
+</div>
+<div class="col-md-6">
+<div class="card">
+<div class="card-header bg-primary text-white">
+<h5 class="card-title mb-0">Analyze Resource</h5>
+</div>
+<div class="card-body">
+<form id="analyze-form">
+<div class="mb-3">
+<label for="resource-type" class="form-label">Resource Type</label>
+<select class="form-select" id="resource-type" required>
+<option value="pod">Pod</option>
+<option value="deployment">Deployment</option>
+<option value="service">Service</option>
+<option value="custom-resource">Custom Resource</option>
+</select>
+</div>
+<div class="mb-3" id="cr-type-container" style="display: none;">
+<label for="cr-type" class="form-label">Custom Resource Type</label>
+<input type="text" class="form-control" id="cr-type" placeholder="e.g. prometheusrule">
+</div>
+<div class="mb-3">
+<label for="resource-name" class="form-label">Resource Name</label>
+<input type="text" class="form-control" id="resource-name" required>
+</div>
+<div class="mb-3">
+<label for="resource-namespace" class="form-label">Namespace</label>
+<input type="text" class="form-control" id="resource-namespace" value="default">
+</div>
+<button type="submit" class="btn btn-primary">Analyze Resource</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+
+<div id="analysis-results" style="display: none;">
+<div class="card mb-4">
+<div class="card-header bg-info text-white">
+<h5 class="card-title mb-0">Analysis Results</h5>
+</div>
+<div class="card-body">
+<div id="results-loading" class="text-center py-5">
+<div class="spinner-border text-success" role="status">
+<span class="visually-hidden">Loading...</span>
+</div>
+<p class="mt-2">Analyzing resources...</p>
+</div>
+<div id="results-content" style="display: none;">
+<div id="issues-container">
+<h4>Issues Detected</h4>
+<div id="issues-list" class="mb-4">
+<!-- Issues will be added here -->
+</div>
+</div>
+<div id="events-container" class="mb-4">
+<h4>Recent Events</h4>
+<div id="events-list">
+<!-- Events will be added here -->
+</div>
+</div>
+<div id="logs-container" class="mb-4">
+<h4>Logs</h4>
+<pre id="logs-content" class="bg-dark text-light p-3 rounded" style="max-height: 300px; overflow-y: auto;"></pre>
+</div>
+<div id="ai-analysis-container">
+<h4>Groot's Analysis</h4>
+<div id="ai-analysis" class="p-3 bg-light rounded border">
+<!-- AI analysis will be added here -->
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    feather.replace();
+
+// Show/hide custom resource type field
+document.getElementById('resource-type').addEventListener('change', function() {
+    const crTypeContainer = document.getElementById('cr-type-container');
+if (this.value === 'custom-resource') {
+    crTypeContainer.style.display = 'block';
+} else {
+    crTypeContainer.style.display = 'none';
+}
+});
+
+// Scan form submission
+document.getElementById('scan-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+const namespace = document.getElementById('namespace').value;
+
+// Show results section and loading
+document.getElementById('analysis-results').style.display = 'block';
+document.getElementById('results-loading').style.display = 'block';
+document.getElementById('results-content').style.display = 'none';
+
+// Scroll to results
+document.getElementById('analysis-results').scrollIntoView({ behavior: 'smooth' });
+
+// Fetch scan results
+fetch('/api/scan', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ namespace: namespace })
+})
+.then(response => response.json())
+.then(data => {
+ // Hide loading
+document.getElementById('results-loading').style.display = 'none';
+document.getElementById('results-content').style.display = 'block';
+
+// Update issues
+const issuesList = document.getElementById('issues-list');
+issuesList.innerHTML = '';
+
+if (data.issues && data.issues.length > 0) {
+    data.issues.forEach((issue, index) => {
+    const issueCard = document.createElement('div');
+issueCard.className = 'card mb-3';
+
+const cardHeader = document.createElement('div');
+cardHeader.className = `card-header ${issue.severity === 'high' ? 'bg-danger' : 'bg-warning'} text-white`;
+cardHeader.textContent = `Issue ${index + 1}: ${issue.issue}`;
+
+const cardBody = document.createElement('div');
+cardBody.className = 'card-body';
+
+const cardText = document.createElement('div');
+cardText.innerHTML = `
+                     <p><strong>Resource:</strong> ${issue.resource_type}/${issue.name}</p>
+                                                                                         <p><strong>Namespace:</strong> ${issue.namespace}</p>
+                                                                                                                                            <p><strong>Severity:</strong> ${issue.severity.toUpperCase()}</p>
+${issue.details ? `<p><strong>Details:</strong> ${issue.details}</p>` : ''}
+`;
+
+cardBody.appendChild(cardText);
+issueCard.appendChild(cardHeader);
+issueCard.appendChild(cardBody);
+issuesList.appendChild(issueCard);
+});
+} else {
+    issuesList.innerHTML = '<div class="alert alert-success">No issues found!</div>';
+}
+
+// Hide events and logs containers
+document.getElementById('events-container').style.display = 'none';
+document.getElementById('logs-container').style.display = 'none';
+
+// Update AI analysis
+const aiAnalysis = document.getElementById('ai-analysis');
+aiAnalysis.innerHTML = data.explanation || 'No analysis available.';
+})
+.catch(error => {
+    console.error('Error scanning namespace:', error);
+
+// Hide loading
+document.getElementById('results-loading').style.display = 'none';
+document.getElementById('results-content').style.display = 'block';
+
+// Show error
+document.getElementById('issues-list').innerHTML = `
+                                                   <div class="alert alert-danger">
+Error scanning namespace: ${error.message}
+</div>
+`;
+
+// Hide other containers
+document.getElementById('events-container').style.display = 'none';
+document.getElementById('logs-container').style.display = 'none';
+document.getElementById('ai-analysis').innerHTML = 'Analysis not available due to error.';
+});
+});
+
+// Analyze form submission
+document.getElementById('analyze-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+const resourceType = document.getElementById('resource-type').value;
+const resourceName = document.getElementById('resource-name').value;
+const namespace = document.getElementById('resource-namespace').value;
+const crType = document.getElementById('cr-type').value;
+
+// Show results section and loading
+document.getElementById('analysis-results').style.display = 'block';
+document.getElementById('results-loading').style.display = 'block';
+document.getElementById('results-content').style.display = 'none';
+
+// Scroll to results
+document.getElementById('analysis-results').scrollIntoView({ behavior: 'smooth' });
+
+// Prepare request data
+const requestData = {
+    type: resourceType === 'custom-resource' ? crType : resourceType,
+name: resourceName,
+namespace: namespace
+};
+
+// Fetch analysis results
+fetch('/api/analyze', {
+method: 'POST',
+headers: {
+    'Content-Type': 'application/json'
+},
+body: JSON.stringify(requestData)
+})
+.then(response => response.json())
+.then(data => {
+// Hide loading
+document.getElementById('results-loading').style.display = 'none';
+document.getElementById('results-content').style.display = 'block';
+
+// Hide issues container
+document.getElementById('issues-container').style.display = 'none';
+
+// Update events
+const eventsContainer = document.getElementById('events-container');
+const eventsList = document.getElementById('events-list');
+eventsList.innerHTML = '';
+
+if (data.events && data.events.length > 0) {
+eventsContainer.style.display = 'block';
+
+const eventsTable = document.createElement('table');
+eventsTable.className = 'table table-striped';
+
+const tableHead = document.createElement('thead');
+tableHead.innerHTML = `
+<tr>
+<th>Type</th>
+<th>Reason</th>
+<th>Message</th>
+<th>Age</th>
+</tr>
+`;
+
+const tableBody = document.createElement('tbody');
+
+data.events.forEach(event => {
+const row = document.createElement('tr');
+row.innerHTML = `
+<td>${event.type || ''}</td>
+<td>${event.reason || ''}</td>
+<td>${event.message || ''}</td>
+<td>${event.lastTimestamp || ''}</td>
+`;
+tableBody.appendChild(row);
+});
+
+eventsTable.appendChild(tableHead);
+eventsTable.appendChild(tableBody);
+eventsList.appendChild(eventsTable);
+} else {
+eventsContainer.style.display = 'none';
+}
+
+// Update logs
+const logsContainer = document.getElementById('logs-container');
+const logsContent = document.getElementById('logs-content');
+
+if (data.logs) {
+logsContainer.style.display = 'block';
+logsContent.textContent = data.logs;
+} else {
+logsContainer.style.display = 'none';
+}
+
+// Update AI analysis
+const aiAnalysis = document.getElementById('ai-analysis');
+aiAnalysis.innerHTML = data.analysis || 'No analysis available.';
+})
+.catch(error => {
+console.error('Error analyzing resource:', error);
+
+// Hide loading
+document.getElementById('results-loading').style.display = 'none';
+document.getElementById('results-content').style.display = 'block';
+
+// Hide containers
+document.getElementById('issues-container').style.display = 'none';
+document.getElementById('events-container').style.display = 'none';
+document.getElementById('logs-container').style.display = 'none';
+
+// Show error in analysis
+document.getElementById('ai-analysis').innerHTML = `
+<div class="alert alert-danger">
+Error analyzing resource: ${error.message}
+</div>
+`;
+});
+});
+});
+</script>
+  </body>
+    </html>

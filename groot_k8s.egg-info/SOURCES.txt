@@ -1,0 +1,17 @@
+README.md
+setup.py
+groot/__init__.py
+groot/ai_assistant.py
+groot/cli.py
+groot/config.py
+groot/k8s_scanner.py
+groot/plugins/__init__.py
+groot/plugins/aws.py
+groot/web/__init__.py
+groot/web/app.py
+groot_k8s.egg-info/PKG-INFO
+groot_k8s.egg-info/SOURCES.txt
+groot_k8s.egg-info/dependency_links.txt
+groot_k8s.egg-info/entry_points.txt
+groot_k8s.egg-info/requires.txt
+groot_k8s.egg-info/top_level.txt
