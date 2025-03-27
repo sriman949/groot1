@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cluster Status - Groot</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css">
+</head>
+<body>
+<div class="app-container">
+    <header>
+        <div class="logo">
+            <i class="fas fa-seedling"></i>
+            <h1>Groot</h1>
+        </div>
+        <div class="subtitle">Kubernetes & Cloud Troubleshooting Assistant</div>
+        <nav>
+            <ul>
+                <li><a href="/"><i class="fas fa-comment"></i> Chat</a></li>
+                <li><a href="/status" class="active"><i class="fas fa-chart-bar"></i> Cluster Status</a></li>
+                <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="status-container">
+            <div class="status-header">
+                <h2>Cluster Status Overview</h2>
+                <button id="refresh-button" class="refresh-button"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+
+            <div class="status-cards">
+                <div class="status-card">
+                    <div class="card-icon"><i class="fas fa-cube"></i></div>
+                    <div class="card-content">
+                        <h3>Pods</h3>
+                        <div class="card-value" id="pod-count">-</div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="card-content">
+                        <h3>Deployments</h3>
+                        <div class="card-value" id="deployment-count">-</div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-icon"><i class="fas fa-network-wired"></i></div>
+                    <div class="card-content">
+                        <h3>Services</h3>
+                        <div class="card-value" id="service-count">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-charts">
+                <div class="chart-container">
+                    <h3>Pod Status Distribution</h3>
+                    <canvas id="pod-status-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="status-tables">
+                <div class="table-container">
+                    <h3>Namespaces</h3>
+                    <div class="table-wrapper">
+                        <table id="namespaces-table">
+                            <thead>
+                            <tr>
+                                <th>Namespace</th>
+                                <th>Status</th>
+                                <th>Age</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Namespaces will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Groot v0.1.0 | <a href="https://github.com/groot-ai/groot" target="_blank">GitHub</a></p>
+    </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="/static/js/status.js"></script>
+</body>
+</html>

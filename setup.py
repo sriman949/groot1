@@ -1,38 +1,42 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+with open("requirements.txt", "r", encoding="utf-8") as f:
+    requirements = f.read().splitlines()
+
 setup(
-    name="groot-k8s",
-    version="1.0.0",
-    description="Advanced AI-powered Kubernetes troubleshooting assistant",
+    name="groot-cli",
+    version="0.1.0",
     author="Groot Team",
-    author_email="groot@example.com",
+    author_email="info@groot-ai.com",
+    description="An AI-powered CLI for Kubernetes troubleshooting and management",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/groot-ai/groot",
     packages=find_packages(),
-    install_requires=[
-        "kubernetes>=24.2.0",
-        "openai>=0.27.0",
-        "spacy>=3.5.0",
-        "tabulate>=0.9.0",
-        "termcolor>=2.2.0",
-        "flask>=2.0.0",
-        "click>=8.0.0",
-        "pyyaml>=6.0",
-        "rich>=12.0.0",
-    ],
-    python_requires=">=3.8",
+    include_package_data=True,
+    package_data={
+        "groot": [
+            "templates/*.yaml",
+            "web/templates/*.html",
+            "web/static/css/*.css",
+            "web/static/js/*.js",
+        ],
+    },
+    install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "groot=groot.cli:main",
+            "groot=groot.cli:app",
         ],
     },
     classifiers=[
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Developers",
-        "Intended Audience :: System Administrators",
-        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
-        "Topic :: System :: Systems Administration",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
     ],
+    python_requires=">=3.9",
 )

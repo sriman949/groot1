@@ -1,0 +1,33 @@
+# Kubernetes configuration
+kubernetes:
+  context: default  # or specify your context
+  namespace: default  # default namespace
+  kubeconfig: ~/.kube/config  # path to kubeconfig file
+
+# OpenAI configuration
+openai:
+  api_key: "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"  # Set your OpenAI API key here or use environment variable
+  model: "gpt-4o"  # OpenAI model to use
+
+# Web interface configuration
+web:
+  enabled: true
+  host: 127.0.0.1
+  port: 8000
+  debug: false
+
+# Logging configuration
+logging:
+  level: info  # debug, info, warning, error
+  file: ~/.groot/groot.log  # log file path
+
+# Analysis configuration
+analysis:
+  max_events: 50  # maximum number of events to analyze
+  max_logs: 100  # maximum number of log lines to analyze
+  timeout: 30  # timeout in seconds for analysis operations
+
+# Knowledge base configuration
+knowledge_base:
+  local_path: ~/.groot/knowledge  # path to local knowledge base
+  update_interval: 86400  # update interval in seconds (1 day)

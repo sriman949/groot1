@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groot - Kubernetes Assistant</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github-dark.css">
+</head>
+<body>
+<div class="app-container">
+    <header>
+        <div class="logo">
+            <i class="fas fa-seedling"></i>
+            <h1>Groot</h1>
+        </div>
+        <div class="subtitle">Kubernetes & Cloud Troubleshooting Assistant</div>
+        <nav>
+            <ul>
+                <li><a href="/" class="active"><i class="fas fa-comment"></i> Chat</a></li>
+                <li><a href="/status"><i class="fas fa-chart-bar"></i> Cluster Status</a></li>
+                <li><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message system">
+                    <div class="message-content">
+                        <p>Hello! I am Groot, your Kubernetes and cloud infrastructure assistant. How can I help you today?</p>
+                        <p>You can ask me questions about your Kubernetes cluster, troubleshoot issues, or get recommendations for best practices.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input">
+                <select id="namespace-selector" class="namespace-selector">
+                    <option value="default">default</option>
+                    <!-- Namespaces will be populated dynamically -->
+                </select>
+                <div class="input-container">
+                    <textarea id="user-input" placeholder="Ask me anything about your Kubernetes cluster..."></textarea>
+                    <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Groot v0.1.0 | <a href="https://github.com/groot-ai/groot" target="_blank">GitHub</a></p>
+    </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/core.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/languages/yaml.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/languages/bash.min.js"></script>
+<script src="/static/js/chat.js"></script>
+</body>
+</html>
