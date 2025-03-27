@@ -6,7 +6,7 @@ kubernetes:
 
 # OpenAI configuration
 openai:
-  api_key: "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"  # Set your OpenAI API key here or use environment variable
+  api_key: ""  # Set your OpenAI API key here or use environment variable
   model: "gpt-4o"  # OpenAI model to use
 
 # Web interface configuration
